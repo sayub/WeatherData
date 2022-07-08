@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.weather.myapplication.databinding.FragmentFirstBinding
 import kotlinx.coroutines.flow.collect
@@ -48,7 +49,11 @@ class FirstFragment : Fragment() {
                     }
                     is WeatherState.Loaded -> {
                         binding.progressBar.visibility = View.INVISIBLE
-                        binding.cityTextView.text = it.data?.name
+                        binding.cityTextView.text = "City: ${it.data?.name}"
+                        binding.temperatureTextView.text = "Temperature: ${it.data?.main?.temp}"
+                        Glide.with(requireContext())
+                            .load("http://openweathermap.org/img/w/${it.data?.weather?.getOrNull(0)?.icon}.png")
+                            .into(binding.weatherIconImageVIew);
                     }
                     is WeatherState.Error -> {
                         binding.progressBar.visibility = View.INVISIBLE
@@ -59,6 +64,10 @@ class FirstFragment : Fragment() {
         }
 
         viewModel.loadWeather()
+
+        binding.buttonGetWeather.setOnClickListener {
+            viewModel.loadWeather()
+        }
     }
 
     override fun onDestroyView() {
